@@ -7,8 +7,8 @@ import (
 	"Ainotes/repository"
 	"Ainotes/service"
 
-	"github.com/gin-gonic/gin"
 	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
@@ -37,18 +37,20 @@ func main() {
 	noteController := controller.NewNoteController(noteService)
 	quizController := controller.NewQuizController(quizService)
 	flashcardController := controller.NewFlashcardController(flashcardService)
-
 	// Set up router
 	r := gin.Default()
 
-	   // Tambahkan middleware CORS
-	   r.Use(cors.New(cors.Config{
-        AllowOrigins:     []string{"http://localhost:3000", "https://platform.cognir.ai"},
-        AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},
-        AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
-        ExposeHeaders:    []string{"Content-Length"},
-        AllowCredentials: true,
-    }))
+	// Set trusted proxies untuk keamanan
+	r.SetTrustedProxies([]string{"127.0.0.1", "::1"})
+
+	// Tambahkan middleware CORS
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:3000", "https://platform.cognir.ai"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+	}))
 
 	// Apply Supabase Auth middleware to all /api routes
 	api := r.Group("/api", middleware.SupabaseAuthMiddleware())
